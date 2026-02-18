@@ -29,7 +29,7 @@ repositories {
 }
 
 dependencies {
-  implementation "com.github.<YOUR_GITHUB_USER>:FoxTelemetry:v1.0.0"
+  implementation "com.github.foxhosdev:FoxTelemetry:v1.0.0"
 }
 ```
 
