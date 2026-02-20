@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -20,6 +21,11 @@ import java.util.List;
  * intermittent network/API downtime.
  */
 public final class EventQueue {
+
+    // Queue hard limits
+    private static final int MAX_EVENTS = 10_000;
+    private static final long MAX_BYTES = 10L * 1024L * 1024L; // 10 MB
+    private static final String LOG_TAG = "FoxTelemetryQueue";
 
     private static final String DB_NAME = "foxtelemetry.db";
     private static final int DB_VERSION = 1;
@@ -43,6 +49,7 @@ public final class EventQueue {
             db.execSQL(
                     "INSERT INTO " + TABLE_EVENTS + " (payload) VALUES (?)",
                     new Object[]{event.toString()});
+            enforceLimits(db);
         }
     }
 
@@ -82,6 +89,76 @@ public final class EventQueue {
             } catch (Exception ignored) {}
             return 0;
         }
+    }
+
+    // Package-private for tests/diagnostics
+    long byteSizeEstimate() {
+        synchronized (lock) {
+            SQLiteDatabase db = helper.getReadableDatabase();
+            try (Cursor c = db.rawQuery("SELECT IFNULL(SUM(LENGTH(payload)),0) FROM " + TABLE_EVENTS, null)) {
+                if (c.moveToFirst()) return c.getLong(0);
+            } catch (Exception ignored) {}
+            return 0;
+        }
+    }
+
+    private void enforceLimits(SQLiteDatabase db) {
+        long count = 0;
+        long bytes = 0;
+        try (Cursor c = db.rawQuery("SELECT COUNT(*), IFNULL(SUM(LENGTH(payload)),0) FROM " + TABLE_EVENTS, null)) {
+            if (c.moveToFirst()) {
+                count = c.getLong(0);
+                bytes = c.getLong(1);
+            }
+        }
+
+        if (count <= MAX_EVENTS && bytes <= MAX_BYTES) return;
+
+        List<Long> idsToDelete = new ArrayList<>();
+        long countAfter = count;
+        long bytesAfter = bytes;
+
+        try (Cursor c = db.rawQuery(
+                "SELECT id, LENGTH(payload) AS len FROM " + TABLE_EVENTS + " ORDER BY id ASC",
+                null)) {
+            while (c.moveToNext() && (countAfter > MAX_EVENTS || bytesAfter > MAX_BYTES)) {
+                long id = c.getLong(0);
+                long len = c.getLong(1);
+                idsToDelete.add(id);
+                countAfter--;
+                bytesAfter -= len;
+            }
+        }
+
+        if (!idsToDelete.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < idsToDelete.size(); i++) {
+                if (i > 0) sb.append(',');
+                sb.append(idsToDelete.get(i));
+            }
+            db.execSQL("DELETE FROM " + TABLE_EVENTS + " WHERE id IN (" + sb + ")");
+
+            Log.d(LOG_TAG, "purge count=" + idsToDelete.size() +
+                    " sizeBefore=" + bytes + " sizeAfter=" + bytesAfter +
+                    " countBefore=" + count + " countAfter=" + countAfter);
+        }
+    }
+
+    // Visible for tests
+    static int planPurgeCount(List<Long> lengths) {
+        long count = lengths.size();
+        long bytes = 0;
+        for (Long l : lengths) bytes += l;
+
+        int purged = 0;
+        int i = 0;
+        while ((count > MAX_EVENTS || bytes > MAX_BYTES) && i < lengths.size()) {
+            bytes -= lengths.get(i);
+            count--;
+            purged++;
+            i++;
+        }
+        return purged;
     }
 
     /**
