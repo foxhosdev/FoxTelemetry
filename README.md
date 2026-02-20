@@ -51,3 +51,4 @@ try {
 
 - Release builds with R8/ProGuard may obfuscate stack traces. For correct file/line in dashboard, upload `mapping.txt` per version and deobfuscate server-side.
 - Library is built with JDK 17 / AGP 8.2; ensure your project toolchain matches or sets `JAVA_HOME` to 17 when building.
+- Events are persisted locally (SQLite) and retried automatically when the API is unreachable.
