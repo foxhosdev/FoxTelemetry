@@ -14,12 +14,12 @@ import androidx.work.WorkManager;
 import com.foxtelemetry.core.CrashHandler;
 import com.foxtelemetry.core.EventQueue;
 import com.foxtelemetry.core.FoxTelemetryConfig;
+import com.foxtelemetry.core.InstallIdStore;
 import com.foxtelemetry.core.TelemetryEventBuilder;
 import com.foxtelemetry.work.FlushWorker;
 
 import org.json.JSONObject;
 
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class FoxTelemetry {
@@ -43,7 +43,7 @@ public final class FoxTelemetry {
         Context app = context.getApplicationContext();
         config = cfg;
 
-        if (installId == null) installId = UUID.randomUUID().toString();
+        if (installId == null) installId = InstallIdStore.getOrCreateInstallId(app);
         if (queue == null) queue = new EventQueue(app);
 
         if (initialized.compareAndSet(false, true)) {
