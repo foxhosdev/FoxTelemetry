@@ -1,4 +1,4 @@
-# FoxTelemetry (Android) v1.0.1
+# FoxTelemetry (Android) v1.0.2
 
 Android Java telemetry SDK (crashes + caught errors + logs), auto-initialized like Firebase via a `ContentProvider`.
 
@@ -34,7 +34,7 @@ repositories {
 }
 
 dependencies {
-  implementation "com.github.foxhosdev.FoxTelemetry:foxtelemetry:v1.0.1"
+  implementation "com.github.foxhosdev.FoxTelemetry:foxtelemetry:v1.0.2"
 }
 ```
 
