@@ -6,6 +6,7 @@ Android Java telemetry SDK (crashes + caught errors + logs), auto-initialized li
 - Automatic startup via ContentProvider (no code needed when JSON config is present)
 - Crash + caught-exception reporting, structured log capture
 - Offline-friendly: events stored locally in SQLite and retried when network/API is back
+- Stable installId generated once per install (persisted locally, never logged)
 
 ## 1) Add the JSON config (like google-services.json)
 
@@ -68,3 +69,4 @@ FoxTelemetry.init(appContext, cfg);
 - Library is built with JDK 17 / AGP 8.2; ensure your project toolchain matches or sets `JAVA_HOME` to 17 when building.
 - Events are persisted locally (SQLite) and retried automatically when the API is unreachable.
 - Queued data flushes through `WorkManager`; you can force it with `FoxTelemetry.flushAsync(context)`.
+- installId: created once on first init and persisted; survives app restarts but is not logged or transmitted outside telemetry payloads.
