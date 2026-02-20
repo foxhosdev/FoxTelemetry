@@ -122,7 +122,7 @@ public final class FoxTelemetry {
     }
 
     // Internal access for worker
-    static FoxTelemetryConfig getConfig() { return config; }
-    static EventQueue getQueue() { return queue; }
+    public static FoxTelemetryConfig getConfig() { return config; }
+    public static EventQueue getQueue() { return queue; }
     static String getInstallId() { return installId; }
 }
