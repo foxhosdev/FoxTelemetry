@@ -39,9 +39,9 @@ afterEvaluate {
         publications {
             release(MavenPublication) {
                 from components.release
-                groupId = "com.github.foxhosdev.FoxTelemetry"
-                artifactId = "foxtelemetry"
-                version = "1.0.2"
+                groupId = "com.github.foxhosdev"
+                artifactId = "FoxTelemetry"
+                version = "1.0.3"
             }
         }
     }
