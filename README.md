@@ -8,6 +8,7 @@ Android Java telemetry SDK (crashes + caught errors + logs), auto-initialized li
 - Offline-friendly: events stored locally in SQLite and retried when network/API is back
 - Stable installId generated once per install (persisted locally, never logged)
 - Queue safety: capped to ~10k events or 10 MB with automatic purge of oldest entries
+- Network hardening: HTTPS required by default, gzip payloads, User-Agent set
 
 ## 1) Add the JSON config (like google-services.json)
 
@@ -72,3 +73,4 @@ FoxTelemetry.init(appContext, cfg);
 - Queued data flushes through `WorkManager`; you can force it with `FoxTelemetry.flushAsync(context)`.
 - installId: created once on first init and persisted; survives app restarts but is not logged or transmitted outside telemetry payloads.
 - Queue limits: if the local queue exceeds ~10k events or 10 MB, the oldest events are purged automatically (FIFO) and a debug log is emitted.
+- Network: HTTPS endpoints required by default; set `allowHttp:true` in `foxtelemetry.json` only for local/dev. Payloads are sent with `Content-Encoding: gzip` and `User-Agent: FoxTelemetry-Android/<version>`.

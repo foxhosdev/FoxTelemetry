@@ -36,6 +36,7 @@ public final class ConfigLoader {
                 String endpoint = fox.getString("endpoint");
                 String ingestKey = fox.getString("ingestKey");
                 String environment = fox.optString("environment", null);
+                boolean allowHttp = fox.optBoolean("allowHttp", false);
 
                 return new FoxTelemetryConfig(
                         projectId,
@@ -46,7 +47,8 @@ public final class ConfigLoader {
                         environment,
                         null,
                         true,
-                        80
+                        80,
+                        allowHttp
                 );
             }
         } catch (Exception e) {

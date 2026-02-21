@@ -14,6 +14,7 @@ public final class FoxTelemetryConfig {
 
     public final boolean enableCrashCapture;
     public final int maxStackFrames;
+    public final boolean allowHttp;
 
     public FoxTelemetryConfig(
             @NonNull String projectId,
@@ -25,6 +26,21 @@ public final class FoxTelemetryConfig {
             @Nullable String userId,
             boolean enableCrashCapture,
             int maxStackFrames
+    ) {
+        this(projectId, appId, packageName, endpoint, ingestKey, environment, userId, enableCrashCapture, maxStackFrames, false);
+    }
+
+    public FoxTelemetryConfig(
+            @NonNull String projectId,
+            @NonNull String appId,
+            @NonNull String packageName,
+            @NonNull String endpoint,
+            @NonNull String ingestKey,
+            @Nullable String environment,
+            @Nullable String userId,
+            boolean enableCrashCapture,
+            int maxStackFrames,
+            boolean allowHttp
     ) {
         if (projectId == null || projectId.trim().isEmpty()) throw new IllegalArgumentException("projectId required");
         if (appId == null || appId.trim().isEmpty()) throw new IllegalArgumentException("appId required");
@@ -41,12 +57,13 @@ public final class FoxTelemetryConfig {
         this.userId = userId;
         this.enableCrashCapture = enableCrashCapture;
         this.maxStackFrames = Math.max(1, maxStackFrames);
+        this.allowHttp = allowHttp;
     }
 
     public FoxTelemetryConfig withUserId(@Nullable String newUserId) {
         return new FoxTelemetryConfig(
                 projectId, appId, packageName, endpoint, ingestKey, environment, newUserId,
-                enableCrashCapture, maxStackFrames
+                enableCrashCapture, maxStackFrames, allowHttp
         );
     }
 }
