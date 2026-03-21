@@ -70,7 +70,7 @@ Gradle:
 
 ```gradle
 dependencies {
-    implementation "com.foxtelemetry:foxtelemetry:1.1.0"
+    implementation "com.foxtelemetry:foxtelemetry:1.2.0"
 }
 ```
 
@@ -194,7 +194,7 @@ FoxTelemetryConfig config = new FoxTelemetryConfig.Builder()
 
 FoxTelemetry uses Semantic Versioning.
 
-Current version: `1.1.0`
+Current version: `1.2.0`
 
 - `MAJOR`: breaking API or behavior changes
 - `MINOR`: backward-compatible features and improvements
