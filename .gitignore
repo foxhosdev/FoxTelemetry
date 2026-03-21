@@ -6,7 +6,11 @@ local.properties
 
 # IDE
 .idea/
+.vscode/
 *.iml
 
 # Misc
 .DS_Store
+*.log
+captures/
+test-output/

@@ -1,11 +1,8 @@
 package com.foxtelemetry.net;
 
-import com.foxtelemetry.core.FoxTelemetryConfig;
+import com.foxtelemetry.api.FoxTelemetryConfig;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
 import java.util.Collections;
 import java.util.zip.GZIPInputStream;
@@ -14,19 +11,21 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(RobolectricTestRunner.class)
-@Config(manifest = Config.NONE, sdk = 30)
 public class IngestClientTest {
 
     @Test
     public void rejectsHttpWhenNotAllowed() throws Exception {
-        FoxTelemetryConfig cfg = new FoxTelemetryConfig(
-                "p", "a", "pkg",
-                "http://example.com/ingest",
-                "key", null, null, true, 80, false);
+        FoxTelemetryConfig cfg = new FoxTelemetryConfig.Builder()
+                .projectId("p")
+                .appId("a")
+                .packageName("pkg")
+                .endpoint("http://example.com/ingest")
+                .ingestKey("key")
+                .allowHttp(false)
+                .build();
 
         int code = IngestClient.sendBatch(cfg, Collections.emptyList());
-        assertEquals(0, code);
+        assertEquals(-1, code);
     }
 
     @Test

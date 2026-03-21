@@ -1,7 +1,5 @@
 package com.foxtelemetry.core;
 
-import com.foxtelemetry.FoxTelemetry;
-
 public final class CrashHandler implements Thread.UncaughtExceptionHandler {
 
     private final Thread.UncaughtExceptionHandler previous;
@@ -13,7 +11,10 @@ public final class CrashHandler implements Thread.UncaughtExceptionHandler {
     @Override
     public void uncaughtException(Thread thread, Throwable throwable) {
         try {
-            FoxTelemetry.report(throwable, "UNCAUGHT_EXCEPTION");
+            FoxCore core = FoxCore.getInstance();
+            if (core != null) {
+                core.report(throwable, "UNCAUGHT_EXCEPTION", true);
+            }
         } catch (Throwable ignored) {
             // never throw from crash handler
         }

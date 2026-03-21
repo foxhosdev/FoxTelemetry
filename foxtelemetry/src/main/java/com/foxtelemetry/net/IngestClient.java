@@ -1,6 +1,6 @@
 package com.foxtelemetry.net;
 
-import com.foxtelemetry.core.FoxTelemetryConfig;
+import com.foxtelemetry.api.FoxTelemetryConfig;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -14,13 +14,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public final class IngestClient {
+    static final int RESULT_BLOCKED_BY_POLICY = -1;
 
     private IngestClient() {}
 
     public static int sendBatch(FoxTelemetryConfig cfg, List<JSONObject> events) throws Exception {
         if (isHttpEndpoint(cfg.endpoint) && !cfg.allowHttp) {
-            android.util.Log.w("FoxTelemetryNet", "Endpoint uses HTTP and allowHttp=false; skipping send.");
-            return 0; // treated as dropped / disabled
+            return RESULT_BLOCKED_BY_POLICY;
         }
 
         JSONObject payload = new JSONObject();
@@ -43,7 +43,7 @@ public final class IngestClient {
         conn.setRequestMethod("POST");
         conn.setDoOutput(true);
 
-        conn.setRequestProperty("User-Agent", "FoxTelemetry-Android/1.0.3");
+        conn.setRequestProperty("User-Agent", "FoxTelemetry-Android/2.0.0");
         conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
         conn.setRequestProperty("X-Fox-Ingest-Key", cfg.ingestKey);
         conn.setRequestProperty("Accept", "application/json");

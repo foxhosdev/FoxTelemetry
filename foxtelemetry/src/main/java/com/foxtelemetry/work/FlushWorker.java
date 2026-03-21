@@ -7,9 +7,9 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.foxtelemetry.FoxTelemetry;
-import com.foxtelemetry.core.EventQueue;
-import com.foxtelemetry.core.FoxTelemetryConfig;
+import com.foxtelemetry.api.FoxTelemetryConfig;
+import com.foxtelemetry.core.FoxCore;
+import com.foxtelemetry.storage.EventStore;
 import com.foxtelemetry.net.IngestClient;
 
 import org.json.JSONObject;
@@ -27,15 +27,16 @@ public final class FlushWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        FoxTelemetryConfig cfg = FoxTelemetry.getConfig();
-        EventQueue q = FoxTelemetry.getQueue();
-
-        if (cfg == null || q == null) {
+        FoxCore core = FoxCore.getInstance();
+        if (core == null) {
             return Result.success();
         }
 
+        FoxTelemetryConfig cfg = core.getConfig();
+        EventStore q = core.getEventStore();
+
         try {
-            List<JSONObject> batch = q.peek(50);
+            List<JSONObject> batch = q.peek(cfg.flushBatchSize);
             if (batch.isEmpty()) return Result.success();
 
             int code = IngestClient.sendBatch(cfg, batch);
@@ -45,11 +46,18 @@ public final class FlushWorker extends Worker {
                 return Result.success();
             }
 
+            if (code < 0) {
+                Log.w(TAG, "Dropping non-deliverable batch due to client policy");
+                q.drop(batch.size());
+                return Result.success();
+            }
+
             if (code == 429 || (code >= 500 && code < 600)) {
                 return Result.retry();
             }
 
             Log.w(TAG, "Non-retryable HTTP " + code);
+            q.drop(batch.size());
             return Result.success();
 
         } catch (Exception e) {

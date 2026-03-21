@@ -10,9 +10,9 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.foxtelemetry.FoxTelemetry;
+import com.foxtelemetry.api.FoxTelemetry;
+import com.foxtelemetry.api.FoxTelemetryConfig;
 import com.foxtelemetry.core.ConfigLoader;
-import com.foxtelemetry.core.FoxTelemetryConfig;
 
 /**
  * Auto-initializes FoxTelemetry if app includes assets/foxtelemetry.json

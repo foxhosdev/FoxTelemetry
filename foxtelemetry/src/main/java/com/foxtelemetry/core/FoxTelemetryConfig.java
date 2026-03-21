@@ -3,6 +3,7 @@ package com.foxtelemetry.core;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+@Deprecated
 public final class FoxTelemetryConfig {
     @NonNull public final String projectId;
     @NonNull public final String appId;
@@ -65,5 +66,21 @@ public final class FoxTelemetryConfig {
                 projectId, appId, packageName, endpoint, ingestKey, environment, newUserId,
                 enableCrashCapture, maxStackFrames, allowHttp
         );
+    }
+
+    @NonNull
+    public com.foxtelemetry.api.FoxTelemetryConfig toPublicConfig() {
+        return new com.foxtelemetry.api.FoxTelemetryConfig.Builder()
+                .projectId(projectId)
+                .appId(appId)
+                .packageName(packageName)
+                .endpoint(endpoint)
+                .ingestKey(ingestKey)
+                .environment(environment)
+                .userId(userId)
+                .enableCrashCapture(enableCrashCapture)
+                .maxStackFrames(maxStackFrames)
+                .allowHttp(allowHttp)
+                .build();
     }
 }
