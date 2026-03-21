@@ -76,6 +76,38 @@ dependencies {
 
 If you publish through a local Maven repository or your own package registry, keep the same semantic version.
 
+## What's New In 1.2.0
+
+FoxTelemetry `1.2.0` prepares the Android SDK for backend integration without changing the core architecture.
+
+- Added backend-facing contract documentation:
+  - `docs/event-schema.md`
+  - `docs/ingest-contract.md`
+- Added root batch metadata for ingest:
+  - `batchId`
+  - `sentAt`
+  - `apiVersion`
+  - `eventCount`
+- Added explicit ingest source headers:
+  - `X-Fox-SDK-Name`
+  - `X-Fox-SDK-Version`
+  - `X-Fox-Schema-Version`
+  - `X-Fox-Platform`
+  - `X-Fox-Client-Package-Version`
+- Added release/build metadata enrichment:
+  - `versionCode`
+  - `buildType`
+  - `flavor`
+  - `releaseChannel`
+  - `buildId`
+- Added device/OS metadata enrichment:
+  - `brand`
+  - `manufacturer`
+  - `model`
+  - `androidVersion`
+  - `sdkInt`
+- Cleaned up incomplete public API behavior by marking `measureMemory()` unsupported until real memory probes are ready
+
 ## Quick Start
 
 ```java
@@ -181,6 +213,11 @@ FoxTelemetryConfig config = new FoxTelemetryConfig.Builder()
         .packageName("com.example.app")
         .endpoint("https://api.example.com/ingest")
         .ingestKey("demo_ingest_key")
+        .versionCode(BuildConfig.VERSION_CODE)
+        .buildType(BuildConfig.BUILD_TYPE)
+        .flavor(BuildConfig.FLAVOR)
+        .releaseChannel("production")
+        .buildId(String.valueOf(BuildConfig.VERSION_CODE))
         .slowTraceThresholdMs(2000L)
         .mainThreadSlowThresholdMs(400L)
         .mainThreadBlockedThresholdMs(3000L)
@@ -189,6 +226,14 @@ FoxTelemetryConfig config = new FoxTelemetryConfig.Builder()
         .enableDebugLogs(true)
         .build();
 ```
+
+Backend-ready release fields such as `buildType`, `flavor`, `releaseChannel`, and `buildId` can be injected through config. `appVersion` and `versionCode` are enriched centrally when available from Android package metadata.
+
+## Backend Contract Docs
+
+- Event schema: [docs/event-schema.md](./docs/event-schema.md)
+- Ingest contract: [docs/ingest-contract.md](./docs/ingest-contract.md)
+- Pre-backend checklist: [TODO_before_backend.md](./TODO_before_backend.md)
 
 ## Versioning
 
