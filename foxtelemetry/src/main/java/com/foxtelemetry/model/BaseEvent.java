@@ -2,8 +2,12 @@ package com.foxtelemetry.model;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.foxtelemetry.core.FoxTelemetryContract;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.UUID;
 
 /**
@@ -14,7 +18,7 @@ public abstract class BaseEvent {
     public final String eventId;
     public final long timestamp;
     public final String type;
-    public String schemaVersion = "2.0";
+    public String schemaVersion = FoxTelemetryContract.SCHEMA_VERSION;
 
     // Metadata added during dispatch
     public String sessionId;
@@ -26,7 +30,17 @@ public abstract class BaseEvent {
     public String screenName;
     public String activeTraceName;
     public String networkState;
-    public String sdkVersion = "2.0.0";
+    public String sdkVersion = FoxTelemetryContract.SDK_VERSION;
+    @Nullable public Long versionCode;
+    @Nullable public String buildType;
+    @Nullable public String flavor;
+    @Nullable public String releaseChannel;
+    @Nullable public String buildId;
+    @Nullable public String deviceBrand;
+    @Nullable public String deviceManufacturer;
+    @Nullable public String deviceModel;
+    @Nullable public String androidVersion;
+    @Nullable public Integer androidSdkInt;
     public org.json.JSONArray breadcrumbs;
 
     protected BaseEvent(@NonNull String type) {
@@ -60,8 +74,53 @@ public abstract class BaseEvent {
         if (activeTraceName != null) json.put("activeTraceName", activeTraceName);
         if (networkState != null) json.put("networkState", networkState);
         if (sdkVersion != null) json.put("sdkVersion", sdkVersion);
+        if (versionCode != null) json.put("versionCode", versionCode.longValue());
+        if (buildType != null) json.put("buildType", buildType);
+        if (flavor != null) json.put("flavor", flavor);
+        if (releaseChannel != null) json.put("releaseChannel", releaseChannel);
+        if (buildId != null) json.put("buildId", buildId);
         if (breadcrumbs != null) json.put("breadcrumbs", breadcrumbs);
+        appendReleaseMetadata(json);
+        appendDeviceMetadata(json);
 
         return json;
+    }
+
+    private void appendReleaseMetadata(@NonNull JSONObject json) throws JSONException {
+        if (appVersion == null
+                && versionCode == null
+                && buildType == null
+                && flavor == null
+                && releaseChannel == null
+                && buildId == null) {
+            return;
+        }
+
+        JSONObject release = new JSONObject();
+        if (appVersion != null) release.put("versionName", appVersion);
+        if (versionCode != null) release.put("versionCode", versionCode.longValue());
+        if (buildType != null) release.put("buildType", buildType);
+        if (flavor != null) release.put("flavor", flavor);
+        if (releaseChannel != null) release.put("releaseChannel", releaseChannel);
+        if (buildId != null) release.put("buildId", buildId);
+        json.put("release", release);
+    }
+
+    private void appendDeviceMetadata(@NonNull JSONObject json) throws JSONException {
+        if (deviceBrand == null
+                && deviceManufacturer == null
+                && deviceModel == null
+                && androidVersion == null
+                && androidSdkInt == null) {
+            return;
+        }
+
+        JSONObject device = new JSONObject();
+        if (deviceBrand != null) device.put("brand", deviceBrand);
+        if (deviceManufacturer != null) device.put("manufacturer", deviceManufacturer);
+        if (deviceModel != null) device.put("model", deviceModel);
+        if (androidVersion != null) device.put("androidVersion", androidVersion);
+        if (androidSdkInt != null) device.put("sdkInt", androidSdkInt.intValue());
+        json.put("device", device);
     }
 }

@@ -1,0 +1,30 @@
+# TODO Before Backend
+
+- [ ] Finalize `docs/event-schema.md`
+- [ ] Finalize `docs/ingest-contract.md`
+- [ ] Keep `schemaVersion` as the backend compatibility key
+- [ ] Keep `sdkVersion` for diagnostics and rollout visibility
+- [ ] Ensure every event carries release metadata:
+- [ ] `appVersion`
+- [ ] `versionCode`
+- [ ] `buildType`
+- [ ] `flavor`
+- [ ] `releaseChannel`
+- [ ] `buildId`
+- [ ] Ensure every event carries device metadata:
+- [ ] `brand`
+- [ ] `manufacturer`
+- [ ] `model`
+- [ ] `androidVersion`
+- [ ] `sdkInt`
+- [ ] Ensure ingest requests send explicit source headers
+- [ ] Ensure root payload includes:
+- [ ] `batchId`
+- [ ] `sentAt`
+- [ ] `apiVersion`
+- [ ] `eventCount`
+- [ ] Keep batch structure backward-compatible with existing fields
+- [ ] Remove or clearly block misleading no-op public APIs
+- [ ] Add tests for payload schema and batch metadata
+- [ ] Add tests for new release/device serialization
+- [ ] Freeze the ingest contract before starting Laravel

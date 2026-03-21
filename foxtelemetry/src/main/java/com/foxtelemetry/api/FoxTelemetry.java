@@ -135,10 +135,17 @@ public final class FoxTelemetry {
     }
 
     /**
-     * Measure memory usage of a specific action.
+     * Placeholder for future memory probes.
+     *
+     * This API is intentionally unsupported until the SDK can emit
+     * real memory measurements with a stable contract.
      */
+    @Deprecated
     public static void measureMemory(@NonNull String label, @NonNull Runnable action) {
-        action.run();
+        throw new UnsupportedOperationException(
+                "measureMemory() is not implemented yet. "
+                        + "Use custom traces or track() until stable memory probes are added."
+        );
     }
 
     /**

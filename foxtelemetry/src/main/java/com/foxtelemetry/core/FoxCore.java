@@ -138,6 +138,22 @@ public final class FoxCore implements TelemetryEngine {
         }
     }
 
+    @Nullable
+    private Long getAppVersionCode() {
+        try {
+            android.content.pm.PackageInfo packageInfo = context.getPackageManager()
+                    .getPackageInfo(context.getPackageName(), 0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                return Long.valueOf(packageInfo.getLongVersionCode());
+            }
+            @SuppressWarnings("deprecation")
+            long versionCode = packageInfo.versionCode;
+            return versionCode > 0L ? Long.valueOf(versionCode) : null;
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
     private void triggerFlush() {
         com.foxtelemetry.FoxTelemetry.flushAsync(context);
     }
@@ -216,15 +232,36 @@ public final class FoxCore implements TelemetryEngine {
         event.installId = installId;
         event.userId = config.userId;
         event.appVersion = getAppVersion();
+        event.versionCode = config.versionCode != null ? config.versionCode : getAppVersionCode();
+        event.buildType = config.buildType;
+        event.flavor = config.flavor;
+        event.releaseChannel = config.releaseChannel;
+        event.buildId = config.buildId;
         event.packageName = config.packageName;
         event.environment = config.environment;
         event.screenName = sessionManager.getCurrentScreenName();
         event.activeTraceName = getCurrentActiveTraceName();
         event.networkState = getNetworkState();
+        event.schemaVersion = FoxTelemetryContract.SCHEMA_VERSION;
+        event.sdkVersion = FoxTelemetryContract.SDK_VERSION;
+        event.deviceBrand = valueOrNull(Build.BRAND);
+        event.deviceManufacturer = valueOrNull(Build.MANUFACTURER);
+        event.deviceModel = valueOrNull(Build.MODEL);
+        event.androidVersion = valueOrNull(Build.VERSION.RELEASE);
+        event.androidSdkInt = Integer.valueOf(Build.VERSION.SDK_INT);
 
         if (config.enableAutoBreadcrumbs && !(event instanceof LogEvent)) {
             event.breadcrumbs = new org.json.JSONArray(breadcrumbManager.getBreadcrumbsAsJson());
         }
+    }
+
+    @Nullable
+    private static String valueOrNull(@Nullable String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 
     private void syncAnomalyIdentity(@NonNull AnomalyEvent event) {

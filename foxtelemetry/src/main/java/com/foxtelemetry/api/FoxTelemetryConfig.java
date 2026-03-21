@@ -14,6 +14,11 @@ public final class FoxTelemetryConfig {
     @NonNull public final String ingestKey;
     @Nullable public final String environment;
     @Nullable public final String userId;
+    @Nullable public final String buildType;
+    @Nullable public final String flavor;
+    @Nullable public final String releaseChannel;
+    @Nullable public final String buildId;
+    @Nullable public final Long versionCode;
 
     public final boolean enableCrashCapture;
     public final boolean enableAnomalyDetection;
@@ -55,6 +60,11 @@ public final class FoxTelemetryConfig {
         this.ingestKey = builder.ingestKey;
         this.environment = builder.environment;
         this.userId = builder.userId;
+        this.buildType = builder.buildType;
+        this.flavor = builder.flavor;
+        this.releaseChannel = builder.releaseChannel;
+        this.buildId = builder.buildId;
+        this.versionCode = builder.versionCode;
         this.enableCrashCapture = builder.enableCrashCapture;
         this.enableAnomalyDetection = builder.enableAnomalyDetection;
         this.enableSessionTracking = builder.enableSessionTracking;
@@ -99,6 +109,11 @@ public final class FoxTelemetryConfig {
         private String ingestKey;
         private String environment;
         private String userId;
+        private String buildType;
+        private String flavor;
+        private String releaseChannel;
+        private String buildId;
+        private Long versionCode;
 
         private boolean enableCrashCapture = true;
         private boolean enableAnomalyDetection = true;
@@ -142,6 +157,11 @@ public final class FoxTelemetryConfig {
             this.ingestKey = config.ingestKey;
             this.environment = config.environment;
             this.userId = config.userId;
+            this.buildType = config.buildType;
+            this.flavor = config.flavor;
+            this.releaseChannel = config.releaseChannel;
+            this.buildId = config.buildId;
+            this.versionCode = config.versionCode;
             this.enableCrashCapture = config.enableCrashCapture;
             this.enableAnomalyDetection = config.enableAnomalyDetection;
             this.enableSessionTracking = config.enableSessionTracking;
@@ -181,6 +201,11 @@ public final class FoxTelemetryConfig {
         public Builder ingestKey(@NonNull String ingestKey) { this.ingestKey = ingestKey; return this; }
         public Builder environment(@Nullable String environment) { this.environment = environment; return this; }
         public Builder userId(@Nullable String userId) { this.userId = userId; return this; }
+        public Builder versionCode(long versionCode) { this.versionCode = Long.valueOf(versionCode); return this; }
+        public Builder buildType(@Nullable String buildType) { this.buildType = normalizeOptional(buildType); return this; }
+        public Builder flavor(@Nullable String flavor) { this.flavor = normalizeOptional(flavor); return this; }
+        public Builder releaseChannel(@Nullable String releaseChannel) { this.releaseChannel = normalizeOptional(releaseChannel); return this; }
+        public Builder buildId(@Nullable String buildId) { this.buildId = normalizeOptional(buildId); return this; }
         
         public Builder enableCrashCapture(boolean enabled) { this.enableCrashCapture = enabled; return this; }
         public Builder enableAnomalyDetection(boolean enabled) { this.enableAnomalyDetection = enabled; return this; }
@@ -241,7 +266,19 @@ public final class FoxTelemetryConfig {
             logSampleRateAfterLimit = Math.max(1, logSampleRateAfterLimit);
             maxDuplicateTracksPerWindow = Math.max(1, maxDuplicateTracksPerWindow);
             trackSampleRateAfterLimit = Math.max(1, trackSampleRateAfterLimit);
+            if (versionCode != null && versionCode.longValue() <= 0L) {
+                versionCode = null;
+            }
             return new FoxTelemetryConfig(this);
+        }
+
+        @Nullable
+        private static String normalizeOptional(@Nullable String value) {
+            if (value == null) {
+                return null;
+            }
+            String trimmed = value.trim();
+            return trimmed.isEmpty() ? null : trimmed;
         }
     }
 }

@@ -38,6 +38,11 @@ public final class ConfigLoader {
                 String endpoint = fox.getString("endpoint");
                 String ingestKey = fox.getString("ingestKey");
                 String environment = fox.optString("environment", null);
+                Long versionCode = fox.has("versionCode") ? Long.valueOf(fox.optLong("versionCode")) : null;
+                String buildType = fox.optString("buildType", null);
+                String flavor = fox.optString("flavor", null);
+                String releaseChannel = fox.optString("releaseChannel", null);
+                String buildId = fox.optString("buildId", null);
                 boolean allowHttp = fox.optBoolean("allowHttp", false);
                 boolean enableCrashCapture = fox.optBoolean("enableCrashCapture", true);
                 boolean enableAutoBreadcrumbs = fox.optBoolean("enableAutoBreadcrumbs", true);
@@ -69,13 +74,17 @@ public final class ConfigLoader {
                 int maxDuplicateTracksPerWindow = fox.optInt("maxDuplicateTracksPerWindow", 5);
                 int trackSampleRateAfterLimit = fox.optInt("trackSampleRateAfterLimit", 5);
 
-                return new FoxTelemetryConfig.Builder()
+                FoxTelemetryConfig.Builder builder = new FoxTelemetryConfig.Builder()
                         .projectId(projectId)
                         .appId(appId)
                         .packageName(packageName)
                         .endpoint(endpoint)
                         .ingestKey(ingestKey)
                         .environment(environment)
+                        .buildType(buildType)
+                        .flavor(flavor)
+                        .releaseChannel(releaseChannel)
+                        .buildId(buildId)
                         .enableCrashCapture(enableCrashCapture)
                         .enableAutoBreadcrumbs(enableAutoBreadcrumbs)
                         .enableSessionTracking(enableSessionTracking)
@@ -105,8 +114,11 @@ public final class ConfigLoader {
                         .logSampleRateAfterLimit(logSampleRateAfterLimit)
                         .maxDuplicateTracksPerWindow(maxDuplicateTracksPerWindow)
                         .trackSampleRateAfterLimit(trackSampleRateAfterLimit)
-                        .allowHttp(allowHttp)
-                        .build();
+                        .allowHttp(allowHttp);
+                if (versionCode != null) {
+                    builder.versionCode(versionCode.longValue());
+                }
+                return builder.build();
             }
         } catch (Exception e) {
             return null;
